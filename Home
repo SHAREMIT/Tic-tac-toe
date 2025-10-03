@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stylish Tic Tac Toe</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+  body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+    min-height: 100vh;
+    margin: 0;
+    padding: 30px 0;
+  }
+  h1 {
+    color: #fff;
+    text-shadow: 2px 2px #ff6f61;
+    margin-bottom: 5px;
+  }
+  .credit {
+    margin-bottom: 20px;
+    font-size: 1rem;
+  }
+  .credit a {
+    text-decoration: none;
+    color: #fff;
+    font-weight: 600;
+    background: rgba(0,0,0,0.2);
+    padding: 5px 12px;
+    border-radius: 20px;
+    transition: background 0.3s, color 0.3s;
+  }
+  .credit a:hover {
+    background: #fff;
+    color: #ff3d3d;
+  }
+  .mode-select {
+    margin: 20px 0;
+  }
+  .mode-select button {
+    margin: 0 10px;
+    padding: 10px 20px;
+    font-weight: 600;
+    border-radius: 50px;
+    border: none;
+    cursor: pointer;
+    background: #ff6f61;
+    color: #fff;
+    font-size: 1rem;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    transition: background 0.3s, transform 0.2s;
+  }
+  .mode-select button:hover {
+    background: #ff3d3d;
+    transform: scale(1.05);
+  }
+  .board {
+    display: grid;
+    grid-template-columns: repeat(3, 120px);
+    grid-gap: 15px;
+    background: rgba(255, 255, 255, 0.15);
+    padding: 20px;
+    border-radius: 20px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+  }
+  .cell {
+    width: 120px;
+    height: 120px;
+    background-color: rgba(255, 255, 255, 0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    font-weight: 600;
+    color: #ff6f61;
+    cursor: pointer;
+    border-radius: 15px;
+    transition: transform 0.2s, background 0.3s, color 0.3s;
+  }
+  .cell:hover {
+    transform: scale(1.1);
+    background-color: #fff3f2;
+    color: #ff3d3d;
+  }
+  #message {
+    margin-top: 25px;
+    font-size: 1.4rem;
+    color: #fff;
+    text-shadow: 1px 1px 2px #000;
+  }
+  button#restartButton {
+    margin-top: 20px;
+    padding: 12px 25px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    border-radius: 50px;
+    background: #ff6f61;
+    color: #fff;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    transition: background 0.3s, transform 0.2s;
+  }
+  button#restartButton:hover {
+    background: #ff3d3d;
+    transform: scale(1.05);
+  }
+  .winner {
+    animation: glow 1s ease-in-out infinite alternate;
+  }
+  @keyframes glow {
+    0% { text-shadow: 0 0 5px #fff; }
+    100% { text-shadow: 0 0 20px #fff3f2; }
+  }
+</style>
+</head>
+<body>
+
+<h1>🎮 Stylish Tic Tac Toe 🎮</h1>
+<div class="credit">
+  by <a href="https://scratch.mit.edu/users/sharemit" target="_blank">@Sharemit</a>
+</div>
+
+<div class="mode-select">
+  <button id="multiplayerBtn">Multiplayer</button>
+  <button id="aiBtn">Play vs AI</button>
+</div>
+
+<div class="board">
+  <div class="cell" data-cell></div>
+  <div class="cell" data-cell></div>
+  <div class="cell" data-cell></div>
+  <div class="cell" data-cell></div>
+  <div class="cell" data-cell></div>
+  <div class="cell" data-cell></div>
+  <div class="cell" data-cell></div>
+  <div class="cell" data-cell></div>
+  <div class="cell" data-cell></div>
+</div>
+
+<div id="message"></div>
+<button id="restartButton">Restart Game</button>
+
+<script>
+  const cells = document.querySelectorAll('[data-cell]');
+  const message = document.getElementById('message');
+  const restartButton = document.getElementById('restartButton');
+  const multiplayerBtn = document.getElementById('multiplayerBtn');
+  const aiBtn = document.getElementById('aiBtn');
+
+  let board = Array(9).fill('');
+  let currentPlayer = 'X';
+  let gameMode = 'multiplayer'; // default
+
+  const winCombinations = [
+    [0,1,2],[3,4,5],[6,7,8],
+    [0,3,6],[1,4,7],[2,5,8],
+    [0,4,8],[2,4,6]
+  ];
+
+  function handleClick(e, index) {
+    if (board[index] !== '' || checkWin(board)) return;
+
+    board[index] = currentPlayer;
+    e.target.textContent = currentPlayer;
+
+    if (checkWin(board)) {
+      message.textContent = `Player ${currentPlayer} wins! 🎉`;
+      highlightWin(currentPlayer);
+    } else if (board.every(cell => cell !== '')) {
+      message.textContent = "It's a draw! 🤝";
+    } else {
+      currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+      message.textContent = `Player ${currentPlayer}'s turn`;
+      if (gameMode === 'ai' && currentPlayer === 'O') {
+        setTimeout(aiMove, 500);
+      }
+    }
+  }
+
+  function aiMove() {
+    const emptyIndexes = board.map((val, idx) => val === '' ? idx : null).filter(val => val !== null);
+    const choice = emptyIndexes[Math.floor(Math.random() * emptyIndexes.length)];
+    board[choice] = 'O';
+    cells[choice].textContent = 'O';
+
+    if (checkWin(board)) {
+      message.textContent = `AI wins! 🤖🎉`;
+      highlightWin('O');
+    } else if (board.every(cell => cell !== '')) {
+      message.textContent = "It's a draw! 🤝";
+    } else {
+      currentPlayer = 'X';
+      message.textContent = `Player ${currentPlayer}'s turn`;
+    }
+  }
+
+  function checkWin(b) {
+    return winCombinations.some(combination => {
+      const [a, b1, c] = combination;
+      return b[a] && b[a] === b[b1] && b[a] === b[c];
+    });
+  }
+
+  function highlightWin(player) {
+    winCombinations.forEach(combination => {
+      const [a, b1, c] = combination;
+      if (board[a] === player && board[b1] === player && board[c] === player) {
+        cells[a].classList.add('winner');
+        cells[b1].classList.add('winner');
+        cells[c].classList.add('winner');
+      }
+    });
+  }
+
+  function startGame() {
+    board.fill('');
+    cells.forEach((cell, index) => {
+      cell.textContent = '';
+      cell.classList.remove('winner');
+      cell.removeEventListener('click', cell.clickListener);
+      cell.clickListener = (e) => handleClick(e, index);
+      cell.addEventListener('click', cell.clickListener);
+    });
+    currentPlayer = 'X';
+    message.textContent = `Player ${currentPlayer}'s turn`;
+  }
+
+  multiplayerBtn.addEventListener('click', () => { gameMode = 'multiplayer'; startGame(); });
+  aiBtn.addEventListener('click', () => { gameMode = 'ai'; startGame(); });
+  restartButton.addEventListener('click', startGame);
+
+  startGame();
+</script>
+
+</body>
+</html>
