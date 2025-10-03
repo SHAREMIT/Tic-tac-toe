@@ -1,0 +1,145 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Neon Code Runner</title>
+  <style>
+    :root {
+      --bg: #0f111a;
+      --editor-bg: #161b25;
+      --text: #ffffff;
+      --neon: #00ffd5;
+      --accent: #222a35;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Fira Code', monospace;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+
+    header {
+      text-align: center;
+      padding: 20px;
+      font-size: 2em;
+      font-weight: bold;
+      color: var(--neon);
+      text-shadow: 0 0 10px var(--neon), 0 0 20px var(--neon);
+      border-bottom: 1px solid var(--neon);
+    }
+
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 20px;
+      flex: 1;
+    }
+
+    .editor-box {
+      background: var(--editor-bg);
+      border: 2px solid var(--neon);
+      box-shadow: 0 0 20px var(--neon);
+      border-radius: 15px;
+      padding: 15px;
+      width: 90%;
+      max-width: 900px;
+      margin-bottom: 20px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    textarea {
+      background: var(--accent);
+      color: var(--text);
+      font-size: 14px;
+      border: none;
+      border-radius: 8px;
+      padding: 15px;
+      height: 250px;
+      resize: vertical;
+      font-family: 'Fira Code', monospace;
+      outline: none;
+    }
+
+    button {
+      margin-top: 15px;
+      background: transparent;
+      border: 2px solid var(--neon);
+      color: var(--neon);
+      padding: 10px 20px;
+      font-size: 1em;
+      border-radius: 50px;
+      cursor: pointer;
+      align-self: flex-start;
+      transition: 0.3s ease;
+      box-shadow: 0 0 10px var(--neon);
+    }
+
+    button:hover {
+      background: var(--neon);
+      color: #000;
+      transform: scale(1.05);
+    }
+
+    .output-box {
+      width: 90%;
+      max-width: 900px;
+      flex: 1;
+      background: white;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 0 15px rgba(0, 255, 213, 0.4);
+    }
+
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    @media (max-width: 768px) {
+      textarea {
+        height: 200px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>💡 Neon HTML Code Runner</header>
+
+  <div class="container">
+    <div class="editor-box">
+      <textarea id="code" placeholder="Write HTML/CSS/JS here...">
+<!-- Example:
+<style> body { background: #000; color: #0f0; } </style>
+<h1>Hello, Code!</h1>
+<script> console.log("It works!"); </script>
+-->
+      </textarea>
+      <button onclick="runCode()">🚀 Run</button>
+    </div>
+    <div class="output-box">
+      <iframe id="output"></iframe>
+    </div>
+  </div>
+
+  <script>
+    function runCode() {
+      const code = document.getElementById("code").value;
+      document.getElementById("output").srcdoc = code;
+    }
+  </script>
+
+</body>
+</html>
